@@ -1,10 +1,10 @@
+import Auth from "./Auth"
+
 export default function App() {
 
   return (
     <div>
-      <ul>
-
-      </ul>
+      <Auth/>
     </div>
   )
 }
