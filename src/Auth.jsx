@@ -25,7 +25,10 @@ export default function Auth() {
 
     return (
         <div className="auth-div">
-            <div className="countainer">
+            <div className={`countainer ${showRegister ? 'show-register' : ''}`}>
+                <div className="mobile-brand">
+                    <img src={weatherIcon} alt="Sunny weather" />
+                </div>
                 <div className={`hider ${showRegister ? 'show-register' : ''}`}>
                     <span className="hider-mark">
                         <img src={weatherIcon} alt="Sunny weather" />

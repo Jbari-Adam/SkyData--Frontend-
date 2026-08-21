@@ -61,6 +61,10 @@
     mix-blend-mode: multiply;
 }
 
+.mobile-brand {
+    display: none;
+}
+
 .hider-kicker,
 .form-kicker {
     margin-bottom: 14px;
@@ -184,18 +188,70 @@ button {
 }
 
 @media (max-width: 600px) {
+    .auth-div {
+        align-items: flex-start;
+        padding: 16px;
+    }
+
     .countainer {
+        position: relative;
         width: 100%;
-        min-height: auto;
-        flex-direction: column;
+        min-height: 620px;
+        display: block;
+        border-radius: 20px;
     }
 
     .hider {
         display: none;
     }
 
+    .mobile-brand {
+        position: absolute;
+        top: 22px;
+        left: 24px;
+        z-index: 2;
+        display: block;
+        width: 58px;
+        height: 58px;
+        background: transparent;
+    }
+
+    .mobile-brand img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        mix-blend-mode: multiply;
+    }
+
     .login,
     .register {
-        padding: 48px 28px;
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        padding: 110px 28px 48px;
+        overflow: hidden;
+        transition: transform 0.45s ease, opacity 0.45s ease;
+    }
+
+    .register {
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .countainer.show-register .login {
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .countainer.show-register .register {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
     }
 }
