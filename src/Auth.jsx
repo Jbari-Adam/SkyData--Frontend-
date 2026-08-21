@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import './css/App.css'
+import weatherIcon from './assets/weather-icon-auth.webp'
 import axios from "axios";
 
 export default function Auth() {
@@ -26,7 +27,9 @@ export default function Auth() {
         <div className="auth-div">
             <div className="countainer">
                 <div className={`hider ${showRegister ? 'show-register' : ''}`}>
-                    <span className="hider-mark">S</span>
+                    <span className="hider-mark">
+                        <img src={weatherIcon} alt="Sunny weather" />
+                    </span>
                     <p className="hider-kicker">SkyData</p>
                     <h2>{showRegister ? 'Your data, in orbit.' : 'Welcome back.'}</h2>
                     <p className="hider-copy">
