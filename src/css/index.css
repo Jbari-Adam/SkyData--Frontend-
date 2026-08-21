@@ -1,3 +1,8 @@
+* {
+  box-sizing: border-box; /* Includes padding and borders in the element's total width/height */
+  margin: 0;              /* Removes default browser margins from body, headings, and lists */
+  padding: 0;             /* Removes default browser padding from lists and forms */
+}
 
 
 body {

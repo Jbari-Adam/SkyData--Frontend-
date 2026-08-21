@@ -1,6 +1,6 @@
 import React, { useState } from "react"
-import axios from "axios"
-
+import './css/App.css'
+import axios from "axios";
 
 export default function Auth() {
     //Login
@@ -9,8 +9,9 @@ export default function Auth() {
 
     //Register
     const [registerName, setregisterName] = useState('');
-    const [registerEmail, setLoginEmail] = useState('');
-    const [registerPassword, setLoginPassword] = useState('');
+    const [registerEmail, setregisterEmail] = useState('');
+    const [registerPassword, setregisterPassword] = useState('');
+    const [showRegister, setShowRegister] = useState(false);
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -22,35 +23,49 @@ export default function Auth() {
 
 
     return (
-        <>
-            <div>
-                <div>
+        <div className="auth-div">
+            <div className="countainer">
+                <div className={`hider ${showRegister ? 'show-register' : ''}`}>
+                    <span className="hider-mark">S</span>
+                    <p className="hider-kicker">SkyData</p>
+                    <h2>{showRegister ? 'Your data, in orbit.' : 'Welcome back.'}</h2>
+                    <p className="hider-copy">
+                        {showRegister
+                            ? 'Create your account and make every insight count.'
+                            : 'Pick up where you left off and keep your data moving.'}
+                    </p>
+                </div>
+
+                <div className="login">
                     <form onSubmit={handleLogin}>
-                        <label>Email :</label><br />
-                        <input type="email" placeholder="Enter your Email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} /><br />
-
-                        <label>Password</label><br />
-                        <input type="password" placeholder="Enter your password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} /><br />
-
-                        <button>Login</button>
+                        <p className="form-kicker">SIGN IN</p>
+                        <h1>Good to see you.</h1>
+                        <p className="form-intro">Sign in to continue to your dashboard.</p>
+                        <label htmlFor="login-email">Email address</label>
+                        <input id="login-email" type="email" placeholder="you@example.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+                        <label htmlFor="login-password">Password</label>
+                        <input id="login-password" type="password" placeholder="Enter your password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+                        <button className="primary-button">Sign in</button>
+                        <button className="switch-button" type="button" onClick={() => setShowRegister(true)}>Create an account <span>-&gt;</span></button>
                     </form>
                 </div>
 
-                <div>
+                <div className="register">
                     <form onSubmit={handleRegister}>
-                        <label>Name :</label><br />
-                        <input type="text" placeholder="Enter your Name" /><br />
-
-                        <label>Email :</label><br />
-                        <input type="email" placeholder="Enter your Email" /><br />
-
-                        <label>Password</label><br />
-                        <input type="password" placeholder="Enter your password" /><br />
-
-                        <button>Register</button>
+                        <p className="form-kicker">NEW HERE?</p>
+                        <h1>Start fresh.</h1>
+                        <p className="form-intro">Build a clearer view of everything that matters.</p>
+                        <label htmlFor="register-name">Name</label>
+                        <input id="register-name" type="text" placeholder="Your name" value={registerName} onChange={(e) => setregisterName(e.target.value)} />
+                        <label htmlFor="register-email">Email address</label>
+                        <input id="register-email" type="email" placeholder="you@example.com" value={registerEmail} onChange={(e) => setregisterEmail(e.target.value)} />
+                        <label htmlFor="register-password">Password</label>
+                        <input id="register-password" type="password" placeholder="Create a password" value={registerPassword} onChange={(e) => setregisterPassword(e.target.value)} />
+                        <button className="primary-button">Create account</button>
+                        <button className="switch-button" type="button" onClick={() => setShowRegister(false)}>Already a member? <span>Sign in</span></button>
                     </form>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
