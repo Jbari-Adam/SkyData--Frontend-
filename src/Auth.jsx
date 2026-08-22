@@ -3,6 +3,10 @@ import './css/App.css'
 import weatherIcon from './assets/weather-icon-auth.webp'
 import axios from "axios";
 
+//Configure Axios to work with Laravel Sanctum
+axios.defaults.withCredentials = true; // Crucial for sending cookies
+axios.defaults.baseURL = "http://localhost:8000";
+
 export default function Auth() {
     //Login
     const [loginEmail, setLoginEmail] = useState('');
@@ -14,12 +18,29 @@ export default function Auth() {
     const [registerPassword, setregisterPassword] = useState('');
     const [showRegister, setShowRegister] = useState(false);
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
+        
+        try {
+            //ask Laravel for a CSRF token
+            await axios.get("/sanctum/csrf-cookie");
+
+        } catch (error) {
+            console.log('somthing went wrong', error)
+        }
     }
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
+
+        try {
+            //ask Laravel for a CSRF token
+            await axios.get("/sanctum/csrf-cookie");
+
+        } catch (error) {
+            console.log('somthing went wrong', error)
+        }
+
     }
 
 
