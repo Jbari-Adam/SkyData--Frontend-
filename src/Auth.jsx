@@ -1,11 +1,7 @@
-import React, { useState } from "react"
-import './css/App.css'
+import { useState } from "react"
 import weatherIcon from './assets/weather-icon-auth.webp'
-import axios from "axios";
-
-//Configure Axios to work with Laravel Sanctum
-axios.defaults.withCredentials = true; // Crucial for sending cookies
-axios.defaults.baseURL = "http://localhost:8000";
+import './css/App.css'
+import { authService } from "./services/authService";
 
 export default function Auth() {
     //Login
@@ -16,32 +12,68 @@ export default function Auth() {
     const [registerName, setregisterName] = useState('');
     const [registerEmail, setregisterEmail] = useState('');
     const [registerPassword, setregisterPassword] = useState('');
+
+    //Verification
     const [showRegister, setShowRegister] = useState(false);
+    const [showVerification, setShowVerification] = useState(false);
+    const [verificationEmail, setVerificationEmail] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
+    const [verificationMessage, setVerificationMessage] = useState('');
+
+    const user = {
+        email: loginEmail,
+        password: loginPassword
+    }
+
+    const registerUser = {
+        name: registerName,
+        email: registerEmail,
+        password: registerPassword,
+        password_confirmation: registerPassword
+    }
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        
-        try {
-            //ask Laravel for a CSRF token
-            await axios.get("/sanctum/csrf-cookie");
 
+        try {
+            const login = await authService.handleLogin(user);
+
+            if (login) {
+                setVerificationEmail(login);
+                setShowVerification(true);
+            }
         } catch (error) {
-            console.log('somthing went wrong', error)
+            console.log('something went wrong', error);
         }
-    }
+    };
 
     const handleRegister = async (e) => {
         e.preventDefault();
 
         try {
-            //ask Laravel for a CSRF token
-            await axios.get("/sanctum/csrf-cookie");
+            const register = await authService.handleRegister(registerUser);
 
+            if (register) {
+                setVerificationEmail(register);
+                setShowVerification(true);
+            }
         } catch (error) {
-            console.log('somthing went wrong', error)
+            console.log('something went wrong', error);
         }
+    };
 
-    }
+    const handleVerification = async (e) => {
+        e.preventDefault();
+        setVerificationMessage('');
+
+        try {
+            await authService.handleVerifyMail(verificationEmail, verificationCode);
+            setVerificationMessage('Email verified successfully.');
+        } catch (error) {
+            setVerificationMessage(error.response?.data?.message || 'Verification failed.');
+        }
+    };
+
 
 
     return (
@@ -50,17 +82,41 @@ export default function Auth() {
                 <div className="mobile-brand">
                     <img src={weatherIcon} alt="Sunny weather" />
                 </div>
-                <div className={`hider ${showRegister ? 'show-register' : ''}`}>
-                    <span className="hider-mark">
-                        <img src={weatherIcon} alt="Sunny weather" />
-                    </span>
-                    <p className="hider-kicker">SkyData</p>
-                    <h2>{showRegister ? 'Your data, in orbit.' : 'Welcome back.'}</h2>
-                    <p className="hider-copy">
-                        {showRegister
-                            ? 'Create your account and make every insight count.'
-                            : 'Pick up where you left off and keep your data moving.'}
-                    </p>
+                <div className={`hider ${showRegister ? 'show-register' : ''} ${showVerification ? 'is-verification' : ''}`}>
+                    {!showVerification ? (
+                        <div className="hider-content">
+                            <span className="hider-mark">
+                                <img src={weatherIcon} alt="Sunny weather" />
+                            </span>
+                            <p className="hider-kicker">SkyData</p>
+                            <h2>{showRegister ? 'Your data, in orbit.' : 'Welcome back.'}</h2>
+                            <p className="hider-copy">
+                                {showRegister
+                                    ? 'Create your account and make every insight count.'
+                                    : 'Pick up where you left off and keep your data moving.'}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="verification-content">
+                            <p className="hider-kicker">ONE LAST STEP</p>
+                            <h2>Check your inbox.</h2>
+                            <p className="hider-copy">Enter the verification code sent to {verificationEmail}.</p>
+                            <form onSubmit={handleVerification} className="verification-form">
+                                <label htmlFor="verification-code">Verification code</label>
+                                <input
+                                    id="verification-code"
+                                    type="text"
+                                    inputMode="numeric"
+                                    maxLength="6"
+                                    placeholder="000000"
+                                    value={verificationCode}
+                                    onChange={(e) => setVerificationCode(e.target.value)}
+                                />
+                                <button className="verification-button">Verify email</button>
+                                {verificationMessage && <p className="verification-message">{verificationMessage}</p>}
+                            </form>
+                        </div>
+                    )}
                 </div>
 
                 <div className="login">

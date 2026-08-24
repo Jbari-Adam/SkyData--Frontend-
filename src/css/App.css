@@ -36,11 +36,19 @@
     color: #172a3a;
     border-radius: 24px;
     z-index: 1;
-    transition: right 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+    transition: right 0.55s cubic-bezier(0.65, 0, 0.35, 1),
+        width 0.55s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .hider.show-register {
     right: 50%;
+}
+
+.hider.is-verification {
+    right: 0;
+    width: 100%;
+    align-items: center;
+    text-align: center;
 }
 
 .hider-mark {
@@ -87,6 +95,76 @@
     color: #486777;
     font-size: 15px;
     line-height: 1.65;
+}
+
+.hider-content,
+.verification-content {
+    animation: hider-content-in 0.45s ease both;
+}
+
+@keyframes hider-content-in {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.verification-content h2 {
+    max-width: 320px;
+    margin-bottom: 16px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: clamp(32px, 4vw, 54px);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+}
+
+.verification-content {
+    width: min(100%, 420px);
+}
+
+.verification-content .hider-copy {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.verification-form {
+    max-width: 290px;
+    margin-top: 26px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
+.verification-form label {
+    color: #385666;
+}
+
+.verification-form input {
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.verification-button {
+    width: 100%;
+    margin-top: 16px;
+    padding: 13px 16px;
+    border: 0;
+    border-radius: 10px;
+    background: #e98b2a;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.verification-message {
+    margin-top: 14px;
+    color: #486777;
+    font-size: 12px;
 }
 
 .login,
@@ -203,6 +281,17 @@ button {
 
     .hider {
         display: none;
+    }
+
+    .hider.is-verification {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        display: flex;
+        width: 100%;
+        height: 100%;
+        padding: 48px 28px;
+        border-radius: 20px;
     }
 
     .mobile-brand {
