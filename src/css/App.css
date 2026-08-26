@@ -9,6 +9,15 @@
     font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
 }
 
+.processing-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgba(23, 42, 58, 0.28);
+    backdrop-filter: blur(1px);
+    cursor: wait;
+}
+
 .countainer {
     display: flex;
     flex-direction: row;
@@ -56,7 +65,7 @@
     height: 86px;
     display: block;
     margin-bottom: 26px;
-    background: transparent;
+    background: #dff1f7;
     border: 0;
     overflow: hidden;
 }
@@ -66,7 +75,7 @@
     height: 100%;
     display: block;
     object-fit: cover;
-    mix-blend-mode: multiply;
+    mix-blend-mode: darken;
 }
 
 .mobile-brand {
@@ -233,6 +242,11 @@ button {
     cursor: pointer;
 }
 
+button:disabled {
+    cursor: wait;
+    opacity: 0.75;
+}
+
 .primary-button {
     width: 100%;
     margin-top: 28px;
@@ -302,7 +316,7 @@ button {
         display: block;
         width: 58px;
         height: 58px;
-        background: transparent;
+        background: #ffffff;
     }
 
     .mobile-brand img {
@@ -310,7 +324,7 @@ button {
         height: 100%;
         display: block;
         object-fit: cover;
-        mix-blend-mode: multiply;
+        mix-blend-mode: darken;
     }
 
     .login,

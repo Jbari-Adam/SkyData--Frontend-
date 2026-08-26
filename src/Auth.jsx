@@ -1,7 +1,7 @@
 import { useState } from "react"
 import weatherIcon from './assets/weather-icon-auth.webp'
-import './css/App.css'
 import { authService } from "./services/authService";
+import './css/App.css'
 
 export default function Auth() {
     //Login
@@ -19,6 +19,7 @@ export default function Auth() {
     const [verificationEmail, setVerificationEmail] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
     const [verificationMessage, setVerificationMessage] = useState('');
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const user = {
         email: loginEmail,
@@ -34,6 +35,7 @@ export default function Auth() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setIsProcessing(true);
 
         try {
             const login = await authService.handleLogin(user);
@@ -44,11 +46,14 @@ export default function Auth() {
             }
         } catch (error) {
             console.log('something went wrong', error);
+        } finally {
+            setIsProcessing(false);
         }
     };
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setIsProcessing(true);
 
         try {
             const register = await authService.handleRegister(registerUser);
@@ -59,11 +64,14 @@ export default function Auth() {
             }
         } catch (error) {
             console.log('something went wrong', error);
+        } finally {
+            setIsProcessing(false);
         }
     };
 
     const handleVerification = async (e) => {
         e.preventDefault();
+        setIsProcessing(true);
         setVerificationMessage('');
 
         try {
@@ -71,6 +79,8 @@ export default function Auth() {
             setVerificationMessage('Email verified successfully.');
         } catch (error) {
             setVerificationMessage(error.response?.data?.message || 'Verification failed.');
+        } finally {
+            setIsProcessing(false);
         }
     };
 
@@ -78,6 +88,7 @@ export default function Auth() {
 
     return (
         <div className="auth-div">
+            {isProcessing && <div className="processing-backdrop" aria-label="Processing request" />}
             <div className={`countainer ${showRegister ? 'show-register' : ''}`}>
                 <div className="mobile-brand">
                     <img src={weatherIcon} alt="Sunny weather" />
@@ -112,7 +123,9 @@ export default function Auth() {
                                     value={verificationCode}
                                     onChange={(e) => setVerificationCode(e.target.value)}
                                 />
-                                <button className="verification-button">Verify email</button>
+                                <button className="verification-button" disabled={isProcessing}>
+                                    {isProcessing ? 'Processing...' : 'Verify email'}
+                                </button>
                                 {verificationMessage && <p className="verification-message">{verificationMessage}</p>}
                             </form>
                         </div>
@@ -128,7 +141,9 @@ export default function Auth() {
                         <input id="login-email" type="email" placeholder="you@example.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
                         <label htmlFor="login-password">Password</label>
                         <input id="login-password" type="password" placeholder="Enter your password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
-                        <button className="primary-button">Sign in</button>
+                        <button className="primary-button" disabled={isProcessing}>
+                            {isProcessing ? 'Processing...' : 'Sign in'}
+                        </button>
                         <button className="switch-button" type="button" onClick={() => setShowRegister(true)}>Create an account <span>-&gt;</span></button>
                     </form>
                 </div>
@@ -144,7 +159,9 @@ export default function Auth() {
                         <input id="register-email" type="email" placeholder="you@example.com" value={registerEmail} onChange={(e) => setregisterEmail(e.target.value)} />
                         <label htmlFor="register-password">Password</label>
                         <input id="register-password" type="password" placeholder="Create a password" value={registerPassword} onChange={(e) => setregisterPassword(e.target.value)} />
-                        <button className="primary-button">Create account</button>
+                        <button className="primary-button" disabled={isProcessing}>
+                            {isProcessing ? 'Processing...' : 'Create account'}
+                        </button>
                         <button className="switch-button" type="button" onClick={() => setShowRegister(false)}>Already a member? <span>Sign in</span></button>
                     </form>
                 </div>
