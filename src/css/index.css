@@ -7,4 +7,5 @@
 
 body {
   background-color: rgb(255, 255, 255);
+  overflow-x: hidden;
 }

@@ -1,42 +1,44 @@
-import axios from "axios";
+import axios from 'axios'
 
-const url = import.meta.env.VITE_API_URL
+const url = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '')
 
 const apiClient = axios.create({
     baseURL: url,
     withCredentials: true,
     withXSRFToken: true,
     headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        }
-    }
-);
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+    },
+})
 
-//layers
+const authEndpoints = [
+    '/sanctum/csrf-cookie',
+    '/api/login',
+    '/api/register',
+    '/api/verifyMail',
+    '/api/resendVerification',
+    '/api/forgot-password',
+    '/api/reset-password',
+    '/api/logout',
+    '/api/user',
+    '/api/profile',
+]
 
 apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         const { status } = error.response || {}
+        const requestUrl = error.config?.url || ''
+        const isAuthRequest = authEndpoints.some((endpoint) => requestUrl.includes(endpoint))
 
-        if (status === 419) {
-            console.log("CSRF Mismatch, status : 419")
-        } else if (status === 401) {
-            console.log("Unauthorized, status : 401")
-            // Automatically log out if session expired
-            localStorage.clear();
-            window.location.href = '/login';
-        } else if (status === 404) {
-            console.log("Page not Found, status : 404")
-        } else if (status === 500) {
-            console.log("Server error, status : 500")
-        } else if (!status) {
-            console.log("Network error - the server didn't even respond, status : null")
+        if (status === 401 && !isAuthRequest && window.location.pathname !== '/login') {
+            localStorage.removeItem('userName')
+            window.location.href = '/login'
         }
 
-        return Promise.reject(error);
+        return Promise.reject(error)
     }
-);
+)
 
-export default apiClient;
+export default apiClient

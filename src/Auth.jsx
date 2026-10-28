@@ -1,90 +1,118 @@
-import { useState } from "react"
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import weatherIcon from './assets/weather-icon-auth.webp'
-import { authService } from "./services/authService";
+import { useAuth } from './auth/useAuth'
+import { authService } from './services/authService'
 import './css/App.css'
 
+function getErrorMessage(error, fallback) {
+    const errors = error.response?.data?.errors
+    const firstValidationError = errors ? Object.values(errors).flat()[0] : null
+    return firstValidationError || error.response?.data?.message || fallback
+}
+
 export default function Auth() {
-    //Login
-    const [loginEmail, setLoginEmail] = useState('');
-    const [loginPassword, setLoginPassword] = useState('');
+    const navigate = useNavigate()
+    const { setUser } = useAuth()
+    const [loginEmail, setLoginEmail] = useState('')
+    const [loginPassword, setLoginPassword] = useState('')
 
-    //Register
-    const [registerName, setregisterName] = useState('');
-    const [registerEmail, setregisterEmail] = useState('');
-    const [registerPassword, setregisterPassword] = useState('');
+    const [registerName, setRegisterName] = useState('')
+    const [registerEmail, setRegisterEmail] = useState('')
+    const [registerPassword, setRegisterPassword] = useState('')
 
-    //Verification
-    const [showRegister, setShowRegister] = useState(false);
-    const [showVerification, setShowVerification] = useState(false);
-    const [verificationEmail, setVerificationEmail] = useState('');
-    const [verificationCode, setVerificationCode] = useState('');
-    const [verificationMessage, setVerificationMessage] = useState('');
-    const [isProcessing, setIsProcessing] = useState(false);
+    const [showRegister, setShowRegister] = useState(false)
+    const [showVerification, setShowVerification] = useState(false)
+    const [verificationEmail, setVerificationEmail] = useState('')
+    const [verificationCode, setVerificationCode] = useState('')
+    const [verificationMessage, setVerificationMessage] = useState('')
+    const [authMessage, setAuthMessage] = useState('')
+    const [isProcessing, setIsProcessing] = useState(false)
+    const [isResending, setIsResending] = useState(false)
 
     const user = {
         email: loginEmail,
-        password: loginPassword
+        password: loginPassword,
     }
 
     const registerUser = {
         name: registerName,
         email: registerEmail,
         password: registerPassword,
-        password_confirmation: registerPassword
+        password_confirmation: registerPassword,
     }
 
     const handleLogin = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
+        e.preventDefault()
+        setIsProcessing(true)
+        setAuthMessage('')
 
         try {
-            const login = await authService.handleLogin(user);
+            const login = await authService.handleLogin(user)
 
             if (login) {
-                setVerificationEmail(login);
-                setShowVerification(true);
+                setVerificationEmail(login.email)
+                setVerificationCode('')
+                setVerificationMessage('')
+                setShowVerification(true)
             }
         } catch (error) {
-            console.log('something went wrong', error);
+            setAuthMessage(getErrorMessage(error, 'Unable to sign in. Check your details and try again.'))
         } finally {
-            setIsProcessing(false);
+            setIsProcessing(false)
         }
-    };
+    }
 
     const handleRegister = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
+        e.preventDefault()
+        setIsProcessing(true)
+        setAuthMessage('')
 
         try {
-            const register = await authService.handleRegister(registerUser);
+            const register = await authService.handleRegister(registerUser)
 
             if (register) {
-                setVerificationEmail(register);
-                setShowVerification(true);
+                setVerificationEmail(register.email)
+                setVerificationCode('')
+                setVerificationMessage('')
+                setShowVerification(true)
             }
         } catch (error) {
-            console.log('something went wrong', error);
+            setAuthMessage(getErrorMessage(error, 'Unable to create your account. Please try again.'))
         } finally {
-            setIsProcessing(false);
+            setIsProcessing(false)
         }
-    };
+    }
 
     const handleVerification = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
-        setVerificationMessage('');
+        e.preventDefault()
+        setIsProcessing(true)
+        setVerificationMessage('')
 
         try {
-            await authService.handleVerifyMail(verificationEmail, verificationCode);
-            setVerificationMessage('Email verified successfully.');
+            const verifiedUser = await authService.handleVerifyMail(verificationEmail, verificationCode)
+            setUser(verifiedUser)
+            navigate('/home', { replace: true })
         } catch (error) {
-            setVerificationMessage(error.response?.data?.message || 'Verification failed.');
+            setVerificationMessage(getErrorMessage(error, 'Verification failed.'))
         } finally {
-            setIsProcessing(false);
+            setIsProcessing(false)
         }
-    };
+    }
 
+    const handleResendVerification = async () => {
+        setIsResending(true)
+        setVerificationMessage('')
 
+        try {
+            const response = await authService.handleResendVerification(verificationEmail)
+            setVerificationMessage(response.message || 'A new verification code has been sent.')
+        } catch (error) {
+            setVerificationMessage(getErrorMessage(error, 'Unable to resend the code right now.'))
+        } finally {
+            setIsResending(false)
+        }
+    }
 
     return (
         <div className="auth-div">
@@ -122,11 +150,16 @@ export default function Auth() {
                                     placeholder="000000"
                                     value={verificationCode}
                                     onChange={(e) => setVerificationCode(e.target.value)}
+                                    pattern="[0-9]{6}"
+                                    required
                                 />
                                 <button className="verification-button" disabled={isProcessing}>
                                     {isProcessing ? 'Processing...' : 'Verify email'}
                                 </button>
-                                {verificationMessage && <p className="verification-message">{verificationMessage}</p>}
+                                <button className="resend-button" type="button" onClick={handleResendVerification} disabled={isResending || isProcessing}>
+                                    {isResending ? 'Sending...' : 'Resend code'}
+                                </button>
+                                {verificationMessage && <p className="verification-message" role="alert">{verificationMessage}</p>}
                             </form>
                         </div>
                     )}
@@ -138,12 +171,14 @@ export default function Auth() {
                         <h1>Good to see you.</h1>
                         <p className="form-intro">Sign in to continue to your dashboard.</p>
                         <label htmlFor="login-email">Email address</label>
-                        <input id="login-email" type="email" placeholder="you@example.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+                        <input id="login-email" type="email" placeholder="you@example.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required autoComplete="email" />
                         <label htmlFor="login-password">Password</label>
-                        <input id="login-password" type="password" placeholder="Enter your password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+                        <input id="login-password" type="password" placeholder="Enter your password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required autoComplete="current-password" />
+                        <button className="forgot-password-link" type="button" onClick={() => navigate('/forgot-password')}>Forgot password?</button>
                         <button className="primary-button" disabled={isProcessing}>
                             {isProcessing ? 'Processing...' : 'Sign in'}
                         </button>
+                        {authMessage && !showRegister && <p className="auth-error" role="alert">{authMessage}</p>}
                         <button className="switch-button" type="button" onClick={() => setShowRegister(true)}>Create an account <span>-&gt;</span></button>
                     </form>
                 </div>
@@ -154,14 +189,15 @@ export default function Auth() {
                         <h1>Start fresh.</h1>
                         <p className="form-intro">Build a clearer view of everything that matters.</p>
                         <label htmlFor="register-name">Name</label>
-                        <input id="register-name" type="text" placeholder="Your name" value={registerName} onChange={(e) => setregisterName(e.target.value)} />
+                        <input id="register-name" type="text" placeholder="Your name" value={registerName} onChange={(e) => setRegisterName(e.target.value)} required autoComplete="name" />
                         <label htmlFor="register-email">Email address</label>
-                        <input id="register-email" type="email" placeholder="you@example.com" value={registerEmail} onChange={(e) => setregisterEmail(e.target.value)} />
+                        <input id="register-email" type="email" placeholder="you@example.com" value={registerEmail} onChange={(e) => setRegisterEmail(e.target.value)} required autoComplete="email" />
                         <label htmlFor="register-password">Password</label>
-                        <input id="register-password" type="password" placeholder="Create a password" value={registerPassword} onChange={(e) => setregisterPassword(e.target.value)} />
+                        <input id="register-password" type="password" placeholder="Create a password" value={registerPassword} onChange={(e) => setRegisterPassword(e.target.value)} required minLength="6" autoComplete="new-password" />
                         <button className="primary-button" disabled={isProcessing}>
                             {isProcessing ? 'Processing...' : 'Create account'}
                         </button>
+                        {authMessage && showRegister && <p className="auth-error" role="alert">{authMessage}</p>}
                         <button className="switch-button" type="button" onClick={() => setShowRegister(false)}>Already a member? <span>Sign in</span></button>
                     </form>
                 </div>

@@ -1,0 +1,234 @@
+.sky-settings-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: grid;
+    place-items: center;
+    animation: sky-settings-layer-in .25s ease-out both;
+}
+
+.sky-settings-backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: rgba(18, 38, 60, .55);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    animation: sky-settings-backdrop-in .3s ease-out both;
+}
+
+.sky-settings-panel {
+    position: relative;
+    z-index: 1;
+    width: min(420px, calc(100% - 36px));
+    padding: 22px;
+    border: 1px solid #e4ebf0;
+    border-radius: 15px;
+    background: #ffffff;
+    color: #1b2a3f;
+    box-shadow: 0 20px 55px rgba(3, 14, 28, .28);
+    transform-origin: center;
+    animation: sky-settings-panel-in .35s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+@keyframes sky-settings-layer-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes sky-settings-backdrop-in {
+    from { backdrop-filter: blur(0); }
+    to { backdrop-filter: blur(10px); }
+}
+
+@keyframes sky-settings-panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.sky-settings-heading,
+.sky-setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.sky-settings-heading > div,
+.sky-setting-row > div:first-child {
+    display: grid;
+    gap: 5px;
+}
+
+.sky-settings-heading p {
+    margin: 0;
+    color: #3e7dd6;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.sky-settings-heading h2 {
+    margin: 0;
+    color: #1b2a3f;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 19px;
+}
+
+.sky-settings-heading > button {
+    border: 0;
+    background: transparent;
+    color: #8491a1;
+    font-size: 21px;
+    cursor: pointer;
+}
+
+.sky-setting-row {
+    padding-top: 18px;
+    margin-top: 18px;
+    border-top: 1px solid #edf0f3;
+}
+
+.sky-setting-row strong {
+    color: #1b2a3f;
+    font-size: 12px;
+}
+
+.sky-setting-row span {
+    color: #8491a1;
+    font-size: 10px;
+}
+
+.sky-unit-toggle {
+    display: flex !important;
+    flex: 0 0 auto;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 8px;
+    background: #eaf3ff;
+}
+
+.sky-unit-toggle button {
+    padding: 7px 9px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #3e7dd6;
+    font: inherit;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.sky-unit-toggle button.selected {
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(29, 64, 99, .12);
+    font-weight: 700;
+}
+
+.sky-theme-toggle {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 23px;
+    padding: 3px;
+    border: 0;
+    border-radius: 20px;
+    background: #c8d5df;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sky-theme-toggle i {
+    display: block;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform .2s ease;
+}
+
+.sky-theme-toggle.selected {
+    background: #3e7dd6;
+}
+
+.sky-theme-toggle.selected i {
+    transform: translateX(17px);
+}
+
+.map-view.dark-mode .sky-settings-panel {
+    border-color: #294768;
+    background: #142c49;
+    color: #edf4fc;
+}
+
+.map-view.dark-mode .sky-settings-heading h2,
+.map-view.dark-mode .sky-setting-row strong {
+    color: #edf4fc;
+}
+
+.map-view.dark-mode .sky-settings-heading > button {
+    color: #a8b8c9;
+}
+
+.map-view.dark-mode .sky-setting-row {
+    border-color: #294768;
+}
+
+.map-view.dark-mode .sky-setting-row span {
+    color: #a8b8c9;
+}
+
+.map-view.dark-mode .sky-unit-toggle {
+    background: #183653;
+}
+
+.map-view.dark-mode .sky-unit-toggle button.selected {
+    background: #315579;
+    color: #edf4fc;
+}
+
+.profile-page.dark-mode .sky-settings-panel {
+    border-color: #294768;
+    background: #142c49;
+    color: #edf4fc;
+}
+
+.profile-page.dark-mode .sky-settings-heading h2,
+.profile-page.dark-mode .sky-setting-row strong {
+    color: #edf4fc;
+}
+
+.profile-page.dark-mode .sky-settings-heading > button {
+    color: #a8b8c9;
+}
+
+.profile-page.dark-mode .sky-setting-row {
+    border-color: #294768;
+}
+
+.profile-page.dark-mode .sky-setting-row span {
+    color: #a8b8c9;
+}
+
+.profile-page.dark-mode .sky-unit-toggle {
+    background: #183653;
+}
+
+.profile-page.dark-mode .sky-unit-toggle button.selected {
+    background: #315579;
+    color: #edf4fc;
+}
+
+@media (max-width: 600px) {
+    .sky-settings-panel {
+        width: calc(100% - 28px);
+        padding: 18px;
+    }
+}

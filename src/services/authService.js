@@ -1,76 +1,59 @@
-import { authApi } from "../api/authApi";
+import { authApi } from '../api/authApi'
 
 export const authService = {
     async handleLogin(credential) {
-        try {
-            await authApi.getCsrfCookie();
-
-            //send login data to the server
-            const response = await authApi.login(credential);
-
-            if (response.data.user) {
-                return response.data.user.email;
-            }
-
-        } catch (error) {
-            throw error;
-        }
+        await authApi.getCsrfCookie()
+        const response = await authApi.login(credential)
+        return response.data.user ?? null
     },
 
     async handleRegister(userData) {
-        try {
-            await authApi.getCsrfCookie();
-
-            //send register data to the server
-            const response = await authApi.register(userData)
-
-            if (response.data.user) {
-                return response.data.user.email;
-            }
-
-        } catch (error) {
-            throw error;
-        }
+        await authApi.getCsrfCookie()
+        const response = await authApi.register(userData)
+        return response.data.user ?? null
     },
 
     async handleLogout() {
-        try {
-            await authApi.getCsrfCookie();
-
-            const response = await authApi.logout();
-
-            if (response.status === 200 || response.status === 204) {
-                localStorage.clear();
-                return true
-            }
-
-        } catch (error) {
-            throw error;
-        }
+        await authApi.getCsrfCookie()
+        const response = await authApi.logout()
+        localStorage.removeItem('userName')
+        return response.status === 200 || response.status === 204
     },
 
     async handleVerifyMail(email, code) {
-        try {
-            await authApi.getCsrfCookie();
+        await authApi.getCsrfCookie()
+        const response = await authApi.verifyMail(email, code)
+        return response.data.user ?? null
+    },
 
-            const response = await authApi.verifyMail(email, code);
+    async handleResendVerification(email) {
+        await authApi.getCsrfCookie()
+        const response = await authApi.resendVerification(email)
+        return response.data
+    },
 
-            if (response.data.user) {
-                localStorage.setItem('userName', response.data.user.name);
-                return true
-            }
+    async handleUpdateProfile(profile) {
+        await authApi.getCsrfCookie()
+        const response = await authApi.updateProfile(profile)
+        return response.data
+    },
 
-        } catch (error) {
-            // Log the full error for debugging
-            console.error('Verify mail error:', error.response?.data || error.message);
-            throw error;
-        }
+    async handleForgotPassword(email) {
+        await authApi.getCsrfCookie()
+        const response = await authApi.forgotPassword(email)
+        return response.data
+    },
+
+    async handleResetPassword(data) {
+        await authApi.getCsrfCookie()
+        const response = await authApi.resetPassword(data)
+        return response.data
     },
 
     handleGoogleLogin() {
         // OAuth requires a full page redirect, so we don't use Axios here.
         // We directly navigate the user's browser to the Laravel Google redirect endpoint.
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-        window.location.href = `${apiUrl}/api/auth/google/redirect`;
+        const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '')
+        window.location.href = `${apiUrl}/api/auth/google/redirect`
     }
 }
